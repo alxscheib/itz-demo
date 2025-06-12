@@ -1,7 +1,1 @@
-# itz-demo
-Demoproject
-
-
-Swagger
-http://localhost:8081/api-docs
-http://localhost:8081/swagger-ui/index.html
+# itz-demo# Demo ProjectSwagger URLs: <br>http://localhost:8081/api-docs <br>http://localhost:8081/swagger-ui/index.html H2: <br>GUI URL: http://localhost:8081/h2-ui <br>JDBC URL: jdbc:h2:mem:testdb <br>User: sa

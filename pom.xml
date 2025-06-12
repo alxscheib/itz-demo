@@ -28,7 +28,12 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<org.springdoc.openapi-starter.version>2.8.8</org.springdoc.openapi-starter.version>
+		<org.mapstruct.version>1.6.3</org.mapstruct.version>
+		<log4j-core.version>2.24.3</log4j-core.version>
 	</properties>
+
+
 	<dependencies>
 
 		<dependency>
@@ -63,7 +68,29 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.8</version>
+			<version>${org.springdoc.openapi-starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${org.mapstruct.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j-core.version}</version>
 		</dependency>
 	</dependencies>
 
