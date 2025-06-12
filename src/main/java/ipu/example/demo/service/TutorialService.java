@@ -1,5 +1,6 @@
 package ipu.example.demo.service;
 
+import ipu.example.demo.model.ServiceException;
 import ipu.example.demo.model.Tutorial;
 import ipu.example.demo.repository.TutorialRepository;
 import java.util.ArrayList;
@@ -10,86 +11,83 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TutorialService {
-  @Autowired
+
   TutorialRepository tutorialRepository;
 
+  @Autowired
+  public TutorialService(TutorialRepository tutorialRepository) {
+    this.tutorialRepository = tutorialRepository;
+  }
 
-  public List<Tutorial> getTutorials() {
-    List<Tutorial> tutorials = new ArrayList<Tutorial>();
-    tutorialRepository.findAll().forEach(tutorials::add);
-
-    return tutorials;
+  public List<Tutorial> getAllTutorials() {
+    return new ArrayList<>(tutorialRepository.findAll());
   }
 
 
   public Optional<Tutorial> getTutorialById(long id) {
-    Optional<Tutorial> tutorial = tutorialRepository.findById(id);
-    return tutorial;
+    return tutorialRepository.findById(id);
   }
 
 
-  public Tutorial createTutorial(Tutorial tutorial) {
+  public Tutorial createTutorial(Tutorial tutorial) throws ServiceException {
     try {
-      Tutorial newTutorial = tutorialRepository.save(tutorial);
-      return newTutorial;
+      return tutorialRepository.save(tutorial == null ? new Tutorial() : tutorial);
     } catch (Exception ex) {
-      throw new RuntimeException("internal error while creating a tutorial", ex);
+      throw new ServiceException("internal error while creating a tutorial", ex);
     }
   }
 
 
-  public Optional<Tutorial> updateTutorial( long id, Tutorial tutorial) {
+  public Optional<Tutorial> updateTutorial( long id, Tutorial tutorial) throws ServiceException {
     Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
 
     try {
       if (tutorialData.isPresent()) {
-        Tutorial _tutorial = tutorialData.get();
-//        _tutorial.setTitle(tutorial.getTitle());
-//        _tutorial.setDescription(tutorial.getDescription());
-        _tutorial = tutorialRepository.save(_tutorial);
-        return Optional.ofNullable(_tutorial);
+        Tutorial tutorial2update = tutorialData.get();
+        tutorial2update.setTitle(tutorial.getTitle());
+        tutorial2update.setDescription(tutorial.getDescription());
+        tutorial2update = tutorialRepository.save(tutorial2update);
+        return Optional.of(tutorial2update);
       } else {
         return Optional.empty();
       }
     }  catch (Exception ex) {
-      throw new RuntimeException("internal error while creating a tutorial", ex);
+      throw new ServiceException("internal error while creating a tutorial", ex);
     }
   }
 
 
-  public void deleteTutorial(long id) {
+  public void deleteTutorial(long id) throws ServiceException {
     try {
       tutorialRepository.deleteById(id);
     } catch (Exception ex) {
-      throw new RuntimeException("internal error while deleting a tutorial", ex);
+      throw new ServiceException("internal error while deleting a tutorial", ex);
     }
   }
 
 
-  public void deleteAllTutorials() {
+  public void deleteAllTutorials() throws ServiceException {
     try {
       tutorialRepository.deleteAll();
     } catch (Exception ex) {
-      throw new RuntimeException("internal error while deleting all tutorials", ex);
+      throw new ServiceException("internal error while deleting all tutorials", ex);
     }
 
   }
 
-  public List<Tutorial> findByTitleContaining(String text) {
+  public List<Tutorial> findByTitleContaining(String text) throws ServiceException {
     try {
-      List<Tutorial> tutorials = tutorialRepository.findByTitleContaining(text);
-      return tutorials;
+      return tutorialRepository.findByTitleContaining(text);
     } catch (Exception ex) {
-      throw new RuntimeException("internal error while searching by title", ex);
+      throw new ServiceException("internal error while searching by title", ex);
     }
   }
 
-  public List<Tutorial> findByDescriptionContaining(String text) {
+  public List<Tutorial> findByDescriptionContaining(String text) throws ServiceException {
     try {
-      List<Tutorial> tutorials = tutorialRepository.findByDescriptionContaining(text);
-      return tutorials;
+      return tutorialRepository.findByDescriptionContaining(text);
     } catch (Exception ex) {
-      throw new RuntimeException("internal error while searching by description", ex);
+      throw new ServiceException("internal error while searching by description", ex);
     }
   }
 }
