@@ -2,92 +2,80 @@ package ipu.example.demo.service;
 
 import ipu.example.demo.model.ServiceException;
 import ipu.example.demo.model.Tutorial;
-import ipu.example.demo.repository.TutorialRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
-public class TutorialService {
+/**
+ * Service interface defining operations for managing {@link Tutorial} entities.
+ * <p>
+ * This service abstracts the business logic and data access layer.
+ */
+public interface TutorialService {
 
-  TutorialRepository tutorialRepository;
+  /**
+   * Retrieves all tutorials.
+   *
+   * @return a list of all tutorials
+   */
+  List<Tutorial> getAllTutorials();
 
-  @Autowired
-  public TutorialService(TutorialRepository tutorialRepository) {
-    this.tutorialRepository = tutorialRepository;
-  }
+  /**
+   * Retrieves a tutorial by its ID.
+   *
+   * @param id the ID of the tutorial
+   * @return an {@link Optional} containing the tutorial if found, or empty if not found
+   */
+  Optional<Tutorial> getTutorialById(long id);
 
-  public List<Tutorial> getAllTutorials() {
-    return new ArrayList<>(tutorialRepository.findAll());
-  }
+  /**
+   * Creates a new tutorial.
+   *
+   * @param tutorial the tutorial entity to create
+   * @return the created tutorial with generated ID
+   * @throws ServiceException if any error occurs during creation
+   */
+  Tutorial createTutorial(Tutorial tutorial) throws ServiceException;
 
+  /**
+   * Updates an existing tutorial identified by ID.
+   *
+   * @param id the ID of the tutorial to update
+   * @param tutorial the tutorial data to update
+   * @return an {@link Optional} containing the updated tutorial if the tutorial exists, or empty if not found
+   * @throws ServiceException if any error occurs during update
+   */
+  Optional<Tutorial> updateTutorial(long id, Tutorial tutorial) throws ServiceException;
 
-  public Optional<Tutorial> getTutorialById(long id) {
-    return tutorialRepository.findById(id);
-  }
+  /**
+   * Deletes a tutorial by its ID.
+   *
+   * @param id the ID of the tutorial to delete
+   * @throws ServiceException if any error occurs during deletion
+   */
+  void deleteTutorial(long id) throws ServiceException;
 
+  /**
+   * Deletes all tutorials.
+   *
+   * @throws ServiceException if any error occurs during deletion
+   */
+  void deleteAllTutorials() throws ServiceException;
 
-  public Tutorial createTutorial(Tutorial tutorial) throws ServiceException {
-    try {
-      return tutorialRepository.save(tutorial == null ? new Tutorial() : tutorial);
-    } catch (Exception ex) {
-      throw new ServiceException("internal error while creating a tutorial", ex);
-    }
-  }
+  /**
+   * Finds tutorials whose titles contain the specified text.
+   *
+   * @param text the partial title text to search for
+   * @return a list of tutorials with titles containing the specified text
+   * @throws ServiceException if any error occurs during the search
+   */
+  List<Tutorial> findByTitleContaining(String text) throws ServiceException;
 
-
-  public Optional<Tutorial> updateTutorial( long id, Tutorial tutorial) throws ServiceException {
-    Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
-
-    try {
-      if (tutorialData.isPresent()) {
-        Tutorial tutorial2update = tutorialData.get();
-        tutorial2update.setTitle(tutorial.getTitle());
-        tutorial2update.setDescription(tutorial.getDescription());
-        tutorial2update = tutorialRepository.save(tutorial2update);
-        return Optional.of(tutorial2update);
-      } else {
-        return Optional.empty();
-      }
-    }  catch (Exception ex) {
-      throw new ServiceException("internal error while creating a tutorial", ex);
-    }
-  }
-
-
-  public void deleteTutorial(long id) throws ServiceException {
-    try {
-      tutorialRepository.deleteById(id);
-    } catch (Exception ex) {
-      throw new ServiceException("internal error while deleting a tutorial", ex);
-    }
-  }
-
-
-  public void deleteAllTutorials() throws ServiceException {
-    try {
-      tutorialRepository.deleteAll();
-    } catch (Exception ex) {
-      throw new ServiceException("internal error while deleting all tutorials", ex);
-    }
-
-  }
-
-  public List<Tutorial> findByTitleContaining(String text) throws ServiceException {
-    try {
-      return tutorialRepository.findByTitleContaining(text);
-    } catch (Exception ex) {
-      throw new ServiceException("internal error while searching by title", ex);
-    }
-  }
-
-  public List<Tutorial> findByDescriptionContaining(String text) throws ServiceException {
-    try {
-      return tutorialRepository.findByDescriptionContaining(text);
-    } catch (Exception ex) {
-      throw new ServiceException("internal error while searching by description", ex);
-    }
-  }
+  /**
+   * Finds tutorials whose descriptions contain the specified text.
+   *
+   * @param text the partial description text to search for
+   * @return a list of tutorials with descriptions containing the specified text
+   * @throws ServiceException if any error occurs during the search
+   */
+  List<Tutorial> findByDescriptionContaining(String text) throws ServiceException;
 }

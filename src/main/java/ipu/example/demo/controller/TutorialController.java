@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,31 +25,47 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Tutorial", description = "Tutorial management APIs")
+/**
+ * REST controller for managing {@link Tutorial} resources.
+ * Provides endpoints to create, read, update, delete, and search tutorials.
+ */
 @RestController
 @RequestMapping("/api/tutorials")
+@Tag(name = "Tutorial", description = "Tutorial management APIs")
 public class TutorialController {
 
   private final TutorialService tutorialService;
   private final TutorialMapper tutorialMapper = Mappers.getMapper(TutorialMapper.class);
 
-  @Autowired
+  /**
+   * Constructor with dependency injection.
+   *
+   * @param tutorialService service layer for handling tutorial operations
+   */
   public TutorialController(TutorialService tutorialService) {
     this.tutorialService = tutorialService;
   }
 
-  @Operation(summary = "View Tutorials",
-      description = "Filters Tutorials by title or description. If no title or description defined return all tutorials.",
+  /**
+   * Retrieves tutorials filtered by optional title or description.
+   * If neither is specified, returns all tutorials.
+   *
+   * @param title optional title filter
+   * @param description optional description filter
+   * @return list of matching {@link TutorialDto} or 204 if none found
+   */
+  @Operation(
+      summary = "View Tutorials",
+      description = "Filters Tutorials by title or description. If no title or description defined, returns all tutorials.",
       tags = { "tutorials", "get", "filter" })
-  @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = TutorialDto.class), mediaType = "application/json") })
-  @ApiResponse(responseCode = "204", description = "No Tutorials found", content = {@Content(schema = @Schema()) })
-  @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+  @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = TutorialDto.class), mediaType = "application/json")})
+  @ApiResponse(responseCode = "204", description = "No Tutorials found")
+  @ApiResponse(responseCode = "500", description = "Internal server error")
   @GetMapping("")
-  public ResponseEntity<List<TutorialDto>> getTutorials(@RequestParam(required = false) String title, @RequestParam(required = false) String description) {
+  public ResponseEntity<List<TutorialDto>> getTutorials(@RequestParam(required = false) String title,
+      @RequestParam(required = false) String description) {
     try {
       List<Tutorial> tutorials;
-      List<TutorialDto> dtos;
-
       if (StringUtils.isNotEmpty(title)) {
         tutorials = tutorialService.findByTitleContaining(title);
       } else if (StringUtils.isNotEmpty(description)) {
@@ -63,38 +78,46 @@ public class TutorialController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
 
-      dtos = tutorialMapper.tutorialsToDtos(tutorials);
+      List<TutorialDto> dtos = tutorialMapper.tutorialsToDtos(tutorials);
       return new ResponseEntity<>(dtos, HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
+  /**
+   * Retrieves a tutorial by its ID.
+   *
+   * @param id the tutorial ID
+   * @return the tutorial if found, or 404 if not
+   */
   @Operation(
       summary = "Find a Tutorial by Id",
-      description = "Get a Tutorial object by sended id. The response is Tutorial object with id, title and description.",
+      description = "Returns a single tutorial by ID.",
       tags = { "tutorials", "get" })
-  @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TutorialDto.class), mediaType = "application/json") })
-  @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }, description = "No Tutorials found")
-  @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+  @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = TutorialDto.class))})
+  @ApiResponse(responseCode = "404", description = "Tutorial not found")
+  @ApiResponse(responseCode = "500", description = "Internal server error")
   @GetMapping("/{id}")
   public ResponseEntity<TutorialDto> getTutorialById(@PathVariable("id") long id) {
     Optional<Tutorial> tutorial = tutorialService.getTutorialById(id);
-
-    if (tutorial.isPresent()) {
-      TutorialDto dto = tutorialMapper.tutorialToDto(tutorial.get());
-      return new ResponseEntity<>(dto, HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    return tutorial.map(value -> new ResponseEntity<>(tutorialMapper.tutorialToDto(value), HttpStatus.OK))
+        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
+  /**
+   * Creates a new tutorial. If the request body is null, an empty tutorial is created.
+   *
+   * @param dto the tutorial data to create
+   * @return the created tutorial
+   */
   @Operation(
       summary = "Create a new Tutorial",
-      description = "Create a new tutorial based on the passed tutorial information. If values are passed, create an empty tutorial.",
+      description = "Creates a new tutorial from provided data or an empty tutorial if no data is provided.",
       tags = { "tutorials", "post" })
-  @ApiResponse(responseCode = "201", content = {@Content(schema = @Schema(implementation = TutorialDto.class), mediaType = "application/json") })
-  @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+  @ApiResponse(responseCode = "201", description = "Tutorial successfully created",
+      content = {@Content(schema = @Schema(implementation = TutorialDto.class))})
+  @ApiResponse(responseCode = "500", description = "Internal server error")
   @PostMapping("")
   public ResponseEntity<TutorialDto> createTutorial(@RequestBody(required = false) TutorialDto dto) {
     try {
@@ -107,36 +130,44 @@ public class TutorialController {
     }
   }
 
+  /**
+   * Updates an existing tutorial by ID.
+   *
+   * @param id the ID of the tutorial to update
+   * @param dto the new data for the tutorial
+   * @return the updated tutorial, or 404 if not found
+   */
   @Operation(
       summary = "Update a Tutorial by Id",
-      description = "Update the tutorial defined by ID.",
+      description = "Updates a tutorial based on its ID.",
       tags = { "tutorials", "put" })
-  @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = TutorialDto.class), mediaType = "application/json") })
-  @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }, description = "Tutorial not found")
-  @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+  @ApiResponse(responseCode = "200", description = "Tutorial successfully updated",
+      content = {@Content(schema = @Schema(implementation = TutorialDto.class))})
+  @ApiResponse(responseCode = "404", description = "Tutorial not found")
+  @ApiResponse(responseCode = "500", description = "Internal server error")
   @PutMapping("/{id}")
   public ResponseEntity<TutorialDto> updateTutorial(@PathVariable("id") long id, @RequestBody TutorialDto dto) {
-    try{
+    try {
       Tutorial tutorial = tutorialMapper.dtoToTutorial(dto);
-      Optional<Tutorial> tutorialData = tutorialService.updateTutorial(id, tutorial);
-
-      if (tutorialData.isPresent()) {
-        TutorialDto newDto = tutorialMapper.tutorialToDto(tutorialData.get());
-        return new ResponseEntity<>(newDto, HttpStatus.OK);
-      } else {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
+      Optional<Tutorial> updated = tutorialService.updateTutorial(id, tutorial);
+      return updated.map(value -> new ResponseEntity<>(tutorialMapper.tutorialToDto(value), HttpStatus.OK))
+          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
+  /**
+   * Deletes all tutorials from the database.
+   *
+   * @return HTTP 204 if successful
+   */
   @Operation(
       summary = "Delete all Tutorials",
-      description = "Delete all Tutorials.",
+      description = "Removes all tutorials from the database.",
       tags = { "tutorials", "delete" })
-  @ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) })
-  @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+  @ApiResponse(responseCode = "204", description = "All tutorials deleted")
+  @ApiResponse(responseCode = "500", description = "Internal server error")
   @DeleteMapping("")
   public ResponseEntity<HttpStatus> deleteAllTutorials() {
     try {
@@ -147,12 +178,18 @@ public class TutorialController {
     }
   }
 
+  /**
+   * Deletes a tutorial by its ID.
+   *
+   * @param id the ID of the tutorial to delete
+   * @return HTTP 204 if successful, or 500 on error
+   */
   @Operation(
       summary = "Delete a Tutorial by Id",
-      description = "Delete a Tutorial defined by Id",
+      description = "Deletes the tutorial with the specified ID.",
       tags = { "tutorials", "delete" })
-  @ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) })
-  @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+  @ApiResponse(responseCode = "204", description = "Tutorial successfully deleted")
+  @ApiResponse(responseCode = "500", description = "Internal server error")
   @DeleteMapping("/{id}")
   public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
     try {
