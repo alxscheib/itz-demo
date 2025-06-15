@@ -9,7 +9,6 @@ import ipu.example.demo.model.ServiceException;
 import ipu.example.demo.model.Tutorial;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -73,11 +72,6 @@ class TutorialServiceTest {
         .build();
   }
 
-  @AfterEach
-  void tearDown() {
-    // Optional cleanup if needed
-  }
-
   /**
    * Tests retrieval of all tutorials.
    */
@@ -86,7 +80,7 @@ class TutorialServiceTest {
   @Order(1)
   void getAllTutorials() {
     List<Tutorial> tutorials = tutorialService.getAllTutorials();
-    assertFalse(tutorials.isEmpty() );
+    assertEquals(4, tutorials.size() );
   }
 
   /**
@@ -98,6 +92,8 @@ class TutorialServiceTest {
   void getTutorialById() {
     Optional<Tutorial> tutorialData = tutorialService.getTutorialById(1);
     assertTrue(tutorialData.isPresent());
+    assertEquals("JSP", tutorialData.get().getTitle());
+    assertEquals("Java JSP", tutorialData.get().getDescription());
   }
 
   /**
@@ -106,14 +102,12 @@ class TutorialServiceTest {
   @DisplayName("JUnit test for createTutorial() method")
   @Test
   @Order(3)
-  void createTutorial() {
-    try {
-      int initSize = tutorialService.getAllTutorials().size();
-      tutorialService.createTutorial(tutorial);
-      assertEquals(initSize + 1, tutorialService.getAllTutorials().size());
-    } catch (Exception e) {
-      fail();
-    }
+  void createTutorial() throws ServiceException {
+    int initSize = tutorialService.getAllTutorials().size();
+    Tutorial newTutorial = tutorialService.createTutorial(tutorial);
+    assertEquals(initSize + 1, tutorialService.getAllTutorials().size());
+    assertEquals(TITLE_1, newTutorial.getTitle());
+    assertEquals(DESCRIPTION_1, newTutorial.getDescription());
   }
 
   /**
@@ -122,17 +116,13 @@ class TutorialServiceTest {
   @DisplayName("JUnit test for updateTutorial() method")
   @Test
   @Order(4)
-  void updateTutorial() {
-    try {
-      Optional<Tutorial> tutorialData = tutorialService.updateTutorial(1, tutorial);
-      if (tutorialData.isPresent()) {
-        Tutorial tut = tutorialData.get();
-        assertEquals(TITLE_1, tut.getTitle());
-        assertEquals(DESCRIPTION_1, tut.getDescription());
-      } else {
-        fail();
-      }
-    } catch (ServiceException e) {
+  void updateTutorial() throws ServiceException {
+    Optional<Tutorial> tutorialData = tutorialService.updateTutorial(1, tutorial);
+    if (tutorialData.isPresent()) {
+      Tutorial tut = tutorialData.get();
+      assertEquals(TITLE_1, tut.getTitle());
+      assertEquals(DESCRIPTION_1, tut.getDescription());
+    } else {
       fail();
     }
   }

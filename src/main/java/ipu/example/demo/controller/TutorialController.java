@@ -12,7 +12,6 @@ import ipu.example.demo.service.TutorialService;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,15 +34,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class TutorialController {
 
   private final TutorialService tutorialService;
-  private final TutorialMapper tutorialMapper = Mappers.getMapper(TutorialMapper.class);
+  private final TutorialMapper tutorialMapper;
 
   /**
    * Constructor with dependency injection.
    *
    * @param tutorialService service layer for handling tutorial operations
    */
-  public TutorialController(TutorialService tutorialService) {
+  public TutorialController(TutorialService tutorialService, TutorialMapper tutorialMapper) {
     this.tutorialService = tutorialService;
+    this.tutorialMapper = tutorialMapper;
   }
 
   /**
