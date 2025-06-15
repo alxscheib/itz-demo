@@ -34,6 +34,8 @@
 		<gson.version>2.13.1</gson.version>
 		<spotbugs.version>4.7.3.0</spotbugs.version>
 		<javadoc-plugin.version>3.11.2</javadoc-plugin.version>
+		<checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
+		<pmd-plugin.version>3.26.0</pmd-plugin.version>
 	</properties>
 
 
@@ -144,6 +146,25 @@
 				<configuration>
 					<xmlOutput>true</xmlOutput>
 					<xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle-plugin.version}</version>
+				<configuration>
+					<outputFileFormat>xml</outputFileFormat>
+					<outputFile>${project.build.directory}/checkstyle-result.xml</outputFile>
+					<!--configLocation>config/checkstyle/google_checks.xml</configLocation-->
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${pmd-plugin.version}</version>
+				<configuration>
+					<outputDirectory>${project.build.directory}</outputDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
