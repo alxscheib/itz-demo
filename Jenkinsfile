@@ -2,9 +2,13 @@ pipeline {
     agent any
 
     tools {
-            maven 'Maven 3.9.10'
-            jdk 'JDK 17'
-        }
+        maven 'Maven 3.9.10'
+        jdk 'JDK 17'
+    }
+
+    environment {
+        SONAR_TOKEN = credentials('sonar-token')
+    }
 
     triggers {
         pollSCM('H/20 * * * *') // läuft automatisch alle 20 Minute
@@ -49,6 +53,12 @@ pipeline {
                         pmdParser(pattern: '**/pmd.xml')
                     ])
                 }
+            }
+        }
+
+        stage('Code Quality - SonarCloud') {
+            steps {
+                sh 'mvn sonar:sonar'
             }
         }
     }
