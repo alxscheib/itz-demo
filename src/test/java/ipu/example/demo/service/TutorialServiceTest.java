@@ -1,15 +1,14 @@
 package ipu.example.demo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import ipu.example.demo.BaseTutorialTest;
 import ipu.example.demo.model.ServiceException;
 import ipu.example.demo.model.Tutorial;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -44,33 +43,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @TestMethodOrder(OrderAnnotation.class)
-class TutorialServiceTest {
-
-  // Test data for titles and descriptions
-  private static final String TITLE_1 = "JDBC";
-  private static final String DESCRIPTION_1 = "Java Database Connectivity";
-
-  private static final String TITLE_2 = "JSP";
-  private static final String DESCRIPTION_2 = "Java Server Pages";
-
-  private static final String TITLE_3 = "Kafka";
-  private static final String DESCRIPTION_3 = "Apache Kafka";
+class TutorialServiceTest  extends BaseTutorialTest {
 
   @Autowired
   private TutorialService tutorialService;
-
-  private Tutorial tutorial;
-
-  /**
-   * Initializes a Tutorial object before each test.
-   */
-  @BeforeEach
-  void setUp() {
-    tutorial = Tutorial.builder()
-        .title(TITLE_1)
-        .description(DESCRIPTION_1)
-        .build();
-  }
 
   /**
    * Tests retrieval of all tutorials.
@@ -80,7 +56,7 @@ class TutorialServiceTest {
   @Order(1)
   void getAllTutorials() {
     List<Tutorial> tutorials = tutorialService.getAllTutorials();
-    assertEquals(4, tutorials.size() );
+    assertEquals(3, tutorials.size() );
   }
 
   /**
@@ -90,10 +66,10 @@ class TutorialServiceTest {
   @Test
   @Order(2)
   void getTutorialById() {
-    Optional<Tutorial> tutorialData = tutorialService.getTutorialById(1);
+    Optional<Tutorial> tutorialData = tutorialService.getTutorialById(firstId);
     assertTrue(tutorialData.isPresent());
-    assertEquals("JSP", tutorialData.get().getTitle());
-    assertEquals("Java JSP", tutorialData.get().getDescription());
+    assertEquals(BaseTutorialTest.TITLE_1, tutorialData.get().getTitle());
+    assertEquals(BaseTutorialTest.DESCRIPTION_1, tutorialData.get().getDescription());
   }
 
   /**
@@ -103,11 +79,10 @@ class TutorialServiceTest {
   @Test
   @Order(3)
   void createTutorial() throws ServiceException {
-    int initSize = tutorialService.getAllTutorials().size();
-    Tutorial newTutorial = tutorialService.createTutorial(tutorial);
-    assertEquals(initSize + 1, tutorialService.getAllTutorials().size());
-    assertEquals(TITLE_1, newTutorial.getTitle());
-    assertEquals(DESCRIPTION_1, newTutorial.getDescription());
+    Tutorial newTutorial = tutorialService.createTutorial(testTutorial);
+    assertEquals(4, tutorialService.getAllTutorials().size());
+    assertEquals(BaseTutorialTest.TITLE_4, newTutorial.getTitle());
+    assertEquals(BaseTutorialTest.DESCRIPTION_4, newTutorial.getDescription());
   }
 
   /**
@@ -117,11 +92,11 @@ class TutorialServiceTest {
   @Test
   @Order(4)
   void updateTutorial() throws ServiceException {
-    Optional<Tutorial> tutorialData = tutorialService.updateTutorial(1, tutorial);
+    Optional<Tutorial> tutorialData = tutorialService.updateTutorial(firstId, testTutorial);
     if (tutorialData.isPresent()) {
       Tutorial tut = tutorialData.get();
-      assertEquals(TITLE_1, tut.getTitle());
-      assertEquals(DESCRIPTION_1, tut.getDescription());
+      assertEquals(TITLE_4, tut.getTitle());
+      assertEquals(DESCRIPTION_4, tut.getDescription());
     } else {
       fail();
     }
@@ -135,15 +110,14 @@ class TutorialServiceTest {
   @Order(5)
   void deleteTutorial() {
     try {
-      int initSize = tutorialService.getAllTutorials().size();
-      Tutorial newTutorial = tutorialService.createTutorial(tutorial);
-      assertEquals(initSize+1, tutorialService.getAllTutorials().size());
+      Tutorial newTutorial = tutorialService.createTutorial(testTutorial);
+      assertEquals(4, tutorialService.getAllTutorials().size());
 
       long newId = newTutorial.getId();
-      assertEquals(TITLE_1, newTutorial.getTitle());
+      assertEquals(TITLE_4, newTutorial.getTitle());
 
       tutorialService.deleteTutorial(newId);
-      assertEquals(initSize, tutorialService.getAllTutorials().size());
+      assertEquals(3, tutorialService.getAllTutorials().size());
     } catch (ServiceException e) {
       fail();
     }
@@ -156,10 +130,7 @@ class TutorialServiceTest {
   @Order(6)
   void deleteAllTutorials() {
     try {
-      tutorialService.createTutorial(tutorial);
-      tutorialService.createTutorial(tutorial);
-      tutorialService.createTutorial(tutorial);
-      assertFalse(tutorialService.getAllTutorials().isEmpty());
+      assertEquals(3, tutorialService.getAllTutorials().size());
 
       tutorialService.deleteAllTutorials();
       assertEquals(0, tutorialService.getAllTutorials().size());
