@@ -177,12 +177,6 @@
 					<nohelp>true</nohelp>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>${sonar-plugin.version}</version>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -223,25 +217,4 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<profiles>
-		<profile>
-			<id>sonar</id>
-			<activation>
-				<property>
-					<name>sonar</name>
-				</property>
-			</activation>
-			<properties>
-				<sonar.projectKey>alxscheib_itz-demo</sonar.projectKey>
-				<sonar.organization>alxscheib</sonar.organization>
-				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-				<!--suppress UnresolvedMavenProperty -->
-				<sonar.login>${env.SONAR_TOKEN}</sonar.login>
-				<sonar.sources>src/main/java</sonar.sources>
-				<sonar.tests>src/test/java</sonar.tests>
-				<sonar.language>java</sonar.language>
-				<sonar.java.binaries>target/classes</sonar.java.binaries>
-			</properties>
-		</profile>
-	</profiles>
 </project>

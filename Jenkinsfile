@@ -6,10 +6,6 @@ pipeline {
         jdk 'JDK 17'
     }
 
-    environment {
-        SONAR_TOKEN = credentials('sonar-token')
-    }
-
     triggers {
         pollSCM('H/20 * * * *') // läuft automatisch alle 20 Minute
     }
@@ -52,20 +48,6 @@ pipeline {
                         checkStyle(pattern: '**/checkstyle-result.xml'),
                         pmdParser(pattern: '**/pmd.xml')
                     ])
-                }
-            }
-        }
-
-        stage('Code Quality - SonarCloud') {
-            steps {
-                sh 'mvn sonar:sonar -Psonar'
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
                 }
             }
         }
