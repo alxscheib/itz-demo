@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     tools {
-            maven 'Maven 3.9.10'
-            jdk 'JDK 17'
-        }
+        maven 'Maven 3.9.10'
+        jdk 'JDK 17'
+    }
 
     triggers {
         pollSCM('H/20 * * * *') // läuft automatisch alle 20 Minute

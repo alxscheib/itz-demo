@@ -36,6 +36,7 @@
 		<javadoc-plugin.version>3.11.2</javadoc-plugin.version>
 		<checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
 		<pmd-plugin.version>3.26.0</pmd-plugin.version>
+		<sonar-plugin.version>3.11.0.3922</sonar-plugin.version>
 	</properties>
 
 
