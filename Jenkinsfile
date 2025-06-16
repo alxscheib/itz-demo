@@ -1,15 +1,10 @@
 pipeline {
     agent any
 
-    // soll im Jenkins vorkonfiguriert sein
     tools {
-        maven 'Maven 3.8.5'
-        jdk 'JDK 17'
-    }
-
-//    environment {
-//        SONAR_TOKEN = credentials('sonar-token')
-//    }
+            maven 'Maven 3.9.10'
+            jdk 'JDK 17'
+        }
 
     triggers {
         pollSCM('H/20 * * * *') // läuft automatisch alle 20 Minute
@@ -56,17 +51,12 @@ pipeline {
                 }
             }
         }
-
-//        stage('Code Quality - SonarCloud') {
-//            steps {
-//                sh 'mvn sonar:sonar'
-//            }
-//        }
     }
 
     post {
         success {
             echo '✅ Build, Test und Analyse erfolgreich!'
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
         }
         failure {
             echo '❌ Fehler beim Build oder bei der Analyse!'
