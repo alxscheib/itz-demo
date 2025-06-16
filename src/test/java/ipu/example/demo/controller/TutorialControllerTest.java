@@ -10,10 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import ipu.example.demo.BaseTutorialTest;
 import ipu.example.demo.model.Tutorial;
-import ipu.example.demo.repository.TutorialRepository;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,41 +43,15 @@ import org.springframework.test.web.servlet.MvcResult;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-class TutorialControllerTest {
+class TutorialControllerTest extends BaseTutorialTest {
 
   /**
    * Base URL of the tutorial API.
    */
   private static final String BASE_URL = "/api/tutorials";
 
-  // Sample titles and descriptions for test data
-  private static final String TITLE_1 = "JDBC";
-  private static final String DESCRIPTION_1 = "Java Database Connectivity";
-
-  private static final String TITLE_2 = "JSP";
-  private static final String DESCRIPTION_2 = "Java Server Pages";
-
-  private static final String TITLE_3 = "Kafka";
-  private static final String DESCRIPTION_3 = "Apache Kafka";
-
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private TutorialRepository tutorialRepository;
-
-  /**
-   * Prepares the test environment by clearing the database
-   * and inserting three sample tutorials.
-   */
-  @BeforeEach
-  void setUp() {
-    tutorialRepository.deleteAll();
-    tutorialRepository.save(Tutorial.builder().title(TITLE_1).description(DESCRIPTION_1).build());
-    tutorialRepository.save(Tutorial.builder().title(TITLE_2).description(DESCRIPTION_2).build());
-    tutorialRepository.save(Tutorial.builder().title(TITLE_3).description(DESCRIPTION_3).build());
-    assertEquals(3, tutorialRepository.count());
-  }
 
   /**
    * Tests the GET endpoint for retrieving all tutorials.
