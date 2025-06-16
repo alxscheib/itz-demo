@@ -58,7 +58,7 @@ pipeline {
 
         stage('Code Quality - SonarCloud') {
             steps {
-                sh 'mvn sonar:sonar'
+                sh 'mvn sonar:sonar -Psonar'
             }
         }
     }
