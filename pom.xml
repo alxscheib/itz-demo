@@ -233,6 +233,7 @@
 			</activation>
 			<properties>
 				<sonar.projectKey>alxscheib_itz-demo</sonar.projectKey>
+				<sonar.organization>alxscheib</sonar.organization>
 				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 				<!--suppress UnresolvedMavenProperty -->
 				<sonar.login>${env.SONAR_TOKEN}</sonar.login>
